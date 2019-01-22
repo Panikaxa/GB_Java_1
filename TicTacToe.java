@@ -1,4 +1,4 @@
-package com.company;
+package ru.geekbrains.lesson4;
 
 import java.util.Random;
 import java.util.Scanner;
@@ -6,12 +6,11 @@ import java.util.Scanner;
 public class TicTacToe {
 
     public static int SIZE = 5;
-    public static int DOTS_TO_WIN = SIZE - 0;
+    public static int DOTS_TO_WIN = SIZE - 1;
     public static final char DOT_EMPTY = '\u258B';
     public static final char DOT_X = 'X';
     public static final char DOT_O = 'O';
     public static char[][] map;
-    public static char[][] temp;
     public static Scanner sc = new Scanner(System.in);
     public static Random rand = new Random();
 
@@ -109,11 +108,9 @@ public class TicTacToe {
     }
     public static void initMap() {
         map = new char[SIZE][SIZE];
-        temp = new char[SIZE][SIZE];
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 map[i][j] = DOT_EMPTY;
-                temp[i][j] = DOT_EMPTY;
             }
         }
     }
