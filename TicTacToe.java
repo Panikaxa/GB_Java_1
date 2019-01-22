@@ -1,4 +1,4 @@
-package ru.geekbrains.lesson4;
+package com.company;
 
 import java.util.Random;
 import java.util.Scanner;
@@ -6,7 +6,7 @@ import java.util.Scanner;
 public class TicTacToe {
 
     public static int SIZE = 5;
-    public static int DOTS_TO_WIN = SIZE - 1;
+    public static int DOTS_TO_WIN = SIZE - 0;
     public static final char DOT_EMPTY = '\u258B';
     public static final char DOT_X = 'X';
     public static final char DOT_O = 'O';
@@ -21,7 +21,7 @@ public class TicTacToe {
         while (true) {
             humanTurn();
             printMap();
-            if (checkWin(DOT_X, map)) {
+            if (checkWin(DOT_X)) {
                 System.out.println("Победил человек");
                 break;
             }
@@ -31,8 +31,8 @@ public class TicTacToe {
             }
             aiTurn();
             printMap();
-            if (checkWin(DOT_O, map)) {
-                System.out.println("Победил Искуственный Интеллект");
+            if (checkWin(DOT_O)) {
+                System.out.println("Победил Искуственный Интеллект ");
                 break;
             }
             if (isMapFull()) {
@@ -43,32 +43,10 @@ public class TicTacToe {
         System.out.println("Игра закончена");
     }
 
-    public static boolean checkWin(char symb, char[][] mass) {
-        int str = 0;
-        int row = 0;
-        int mainDiag = 0;
-        int secDiag = 0;
-        int overMainDiag = 0;
-        int underMainDiag = 0;
-        int overSecDiag = 0;
-        int underSecDiag = 0;
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                str = (mass[i][j] == symb) ? ++str : 0;
-                row = (mass[j][i] == symb) ? ++row : 0;
-                mainDiag = (mass[j][j] == symb) ? ++mainDiag : 0;
-                if (i+j == SIZE-1) secDiag = (mass[i][j] == symb) ? ++secDiag : 0;
-                if (i+1 == j) overMainDiag = (mass[i][j] == symb) ? ++overMainDiag : 0;
-                if (j+1 == i) underMainDiag = (mass[i][j] == symb) ? ++underMainDiag : 0;
-                if (i+j == SIZE-2) overSecDiag = (mass[i][j] == symb) ? ++overSecDiag : 0;
-                if (i+j == SIZE) underSecDiag = (mass[i][j] == symb) ? ++underSecDiag : 0;
-
-                if (str == DOTS_TO_WIN || row == DOTS_TO_WIN || mainDiag == DOTS_TO_WIN ||
-                        secDiag == DOTS_TO_WIN || overMainDiag == DOTS_TO_WIN ||
-                        underMainDiag == DOTS_TO_WIN || overSecDiag == DOTS_TO_WIN ||
-                        underSecDiag == DOTS_TO_WIN) {
-                            return true;
-                }
+    public static boolean checkWin(char symb) {
+        for (int i = 0; i <= SIZE-DOTS_TO_WIN; i++) {
+            for (int j = 0; j <= SIZE-DOTS_TO_WIN; j++) {
+                if (checkLines(symb, i, j) || checkDiag(symb, i, j)) return true;
             }
         }
         return false;
@@ -83,49 +61,32 @@ public class TicTacToe {
     }
 
     public static boolean checkCrit(char symb) {
+
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
-                temp[i][j] = map[i][j];
-            }
-        }
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                if (temp[i][j] == DOT_EMPTY) {
-                    temp[i][j] = symb;
-                    if (checkWin(symb, temp)) {
+                if (map[i][j] == DOT_EMPTY) {
+                    map[i][j] = symb;
+                    if (checkWin(symb)) {
                         System.out.println("Компьютер походил в  " + (j + 1) + " " + (i + 1));
                         map[i][j] = DOT_O;
                         return true;
                     }
+                    map[i][j] = DOT_EMPTY;
                 }
-                temp[i][j] = map[i][j];
             }
         }
         return false;
     }
 
     public static void aiTurn() {
-        int x = rand.nextInt(SIZE);
-        int y = rand.nextInt(SIZE);
+        int x;
+        int y;
         if (!checkCrit(DOT_O)) {
             if (!checkCrit(DOT_X)) {
-                M: do {
-                    for (int i = 0; i < SIZE; i++) {
-                        for (int j = 0; j < SIZE; j++) {
-                            if (map[i][j] == DOT_O) {
-                                if (j == SIZE-1) {
-                                    x = j + 1;
-                                    y = i;
-                                    break M;
-                                } else {
-                                    x = j;
-                                    y = i+1;
-                                    break M;
-                                }
-                            }
-                        }
-                    }
-                } while (!isCellValid(x, y));
+                 do {
+                     x = rand.nextInt(SIZE);
+                     y = rand.nextInt(SIZE);
+                 } while (!isCellValid(x, y));
                 System.out.println("Компьютер походил в точку " + (x + 1) + " " + (y + 1));
                 map[y][x] = DOT_O;
             }
@@ -169,5 +130,67 @@ public class TicTacToe {
             System.out.println();
         }
         System.out.println();
+    }
+
+    public static boolean checkLines(char symb, int x, int y) {
+        boolean cols, rows;
+        for (int i = x; i < DOTS_TO_WIN+x; i++) {
+            cols = true;
+            rows = true;
+            for (int j = y; j < DOTS_TO_WIN+y; j++) {
+                cols = cols && (map[i][j] == symb);
+                rows = rows && (map[j][i] == symb);
+            }
+            if (cols || rows) return true;
+        }
+        return false;
+    }
+
+    public static boolean checkDiag(char symb, int x, int y) {
+        boolean main, sec;
+
+        for (int i = x; i < DOTS_TO_WIN+x; i++) {
+            main = true;
+            sec = true;
+            for (int j = y; j < DOTS_TO_WIN+y; j++) {
+                main = main && (map[j-y+x][j] == symb);
+                sec = sec && (map[DOTS_TO_WIN+y+x-j-1][j] == symb);
+            }
+            if (main || sec) return true;
+        }
+        return false;
+    }
+
+    public static boolean checkWinOld(char symb) {
+        int str = 0;
+        int row = 0;
+        int mainDiag = 0;
+        int secDiag = 0;
+        int overMainDiag = 0;
+        int underMainDiag = 0;
+        int overSecDiag = 0;
+        int underSecDiag = 0;
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                str = (map[i][j] == symb) ? ++str : 0;
+                row = (map[j][i] == symb) ? ++row : 0;
+                mainDiag = (map[j][j] == symb) ? ++mainDiag : 0;
+                if (i+j == SIZE-1) secDiag = (map[i][j] == symb) ? ++secDiag : 0;
+                if (i+1 == j) overMainDiag = (map[i][j] == symb) ? ++overMainDiag : 0;
+                if (j+1 == i) underMainDiag = (map[i][j] == symb) ? ++underMainDiag : 0;
+                if (i+j == SIZE-2) overSecDiag = (map[i][j] == symb) ? ++overSecDiag : 0;
+                if (i+j == SIZE) underSecDiag = (map[i][j] == symb) ? ++underSecDiag : 0;
+
+                if (str == DOTS_TO_WIN || row == DOTS_TO_WIN || mainDiag == DOTS_TO_WIN ||
+                        secDiag == DOTS_TO_WIN || overMainDiag == DOTS_TO_WIN ||
+                        underMainDiag == DOTS_TO_WIN || overSecDiag == DOTS_TO_WIN ||
+                        underSecDiag == DOTS_TO_WIN) {
+                    return true;
+                }
+            }
+            str = 0;
+            row = 0;
+        }
+        return false;
     }
 }
